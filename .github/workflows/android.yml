@@ -26,8 +26,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build SHEMSU web app
-        run: pnpm --filter ./artifacts/shemsu run build
+      - - name: Build SHEMSU
+  env:
+    PORT: 5000
+  run: pnpm --filter ./artifacts/shemsu run build
 
       - name: Setup Java
         uses: actions/setup-java@v4
