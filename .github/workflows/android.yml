@@ -64,30 +64,4 @@ jobs:
         with:
           name: SHEMSU-debug-APK
           path: artifacts/shemsu/android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Add Capacitor Android
-        working-directory: artifacts/shemsu
-        run: npx cap add android
-
-      - name: Sync Capacitor
-        working-directory: artifacts/shemsu
-        run: npx cap sync android
-
-      - name: Build APK
-        working-directory: artifacts/shemsu/android
-        run: ./gradlew assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SHEMSU-debug-APK
-          path: artifacts/shemsu/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
