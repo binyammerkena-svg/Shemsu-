@@ -1,0 +1,54 @@
+name: SHEMSU APK v2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Show SHEMSU files
+        run: |
+          pwd
+          ls -la
+          ls -la artifacts/shemsu
+          cat artifacts/shemsu/package.json
+
+      - name: Build SHEMSU
+        run: pnpm --filter ./artifacts/shemsu run build
+
+      - name: Show build output
+        if: always()
+        run: |
+          echo "=== DIST ==="
+          find artifacts/shemsu/dist -maxdepth 3 -type f -print || true
+
+      - name: Save logs
+        if: always()
+        run: |
+          mkdir -p debug
+          find artifacts/shemsu -maxdepth 2 -type f \
+            -not -path "*/node_modules/*" \
+            -not -path "*/dist/*" > debug/files.txt
+          cp artifacts/shemsu/vite.config.ts debug/vite.config.ts || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: SHEMSU-debug
+          path: debug/
