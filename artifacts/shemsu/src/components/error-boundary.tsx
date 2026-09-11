@@ -47,8 +47,8 @@ function DefaultFallback({ error, resetError }: ErrorFallbackProps) {
           running.
         </p>
         {/* Dev only: messages can carry API responses and other internals. */}
-        <pre className="mt-4 max-h-64 overflow-auto rounded bg-gray-100 p-3 text-left text-xs text-gray-800">
-  {error.message || String(error)}
+        <pre className="mt-4 max-h-96 overflow-auto rounded bg-gray-100 p-3 text-left text-xs text-gray-800 whitespace-pre-wrap">
+  {error.stack || error.message || String(error)}
 </pre>
         <button
           type="button"
