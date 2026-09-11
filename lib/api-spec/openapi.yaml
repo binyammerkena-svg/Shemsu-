@@ -3,13 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: SHEMSU marketplace API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+  - name: products
+  - name: favorites
+  - name: cart
+  - name: orders
+  - name: seller
 paths:
   /healthz:
     get:
@@ -24,7 +30,341 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /auth/signup:
+    post:
+      operationId: signup
+      tags: [auth]
+      summary: Create a marketplace account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Log into a marketplace account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Log out of the current session
+      responses:
+        "204":
+          description: Logged out
+  /me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get the current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /home-summary:
+    get:
+      operationId: getHomeSummary
+      tags: [products]
+      summary: Get home page product groups
+      responses:
+        "200":
+          description: Home content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HomeSummary"
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: Search and browse products
+      parameters:
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: seller
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 40 }
+      responses:
+        "200":
+          description: Products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [seller]
+      summary: Create a seller product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Created product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get product details
+      parameters:
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    patch:
+      operationId: updateProduct
+      tags: [seller]
+      summary: Update a seller product
+      parameters:
+        - $ref: "#/components/parameters/ProductId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    delete:
+      operationId: deleteProduct
+      tags: [seller]
+      summary: Delete a seller product
+      parameters:
+        - $ref: "#/components/parameters/ProductId"
+      responses:
+        "204":
+          description: Deleted
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [products]
+      summary: List marketplace categories
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: string }
+  /favorites:
+    get:
+      operationId: listFavorites
+      tags: [favorites]
+      summary: List saved products
+      responses:
+        "200":
+          description: Favorite products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+  /favorites/{productId}:
+    post:
+      operationId: addFavorite
+      tags: [favorites]
+      summary: Save a product
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+      responses:
+        "201":
+          description: Saved product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    delete:
+      operationId: removeFavorite
+      tags: [favorites]
+      summary: Remove a saved product
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+      responses:
+        "204":
+          description: Removed
+  /cart:
+    get:
+      operationId: getCart
+      tags: [cart]
+      summary: Get the current cart
+      responses:
+        "200":
+          description: Cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+    post:
+      operationId: addToCart
+      tags: [cart]
+      summary: Add a product to the cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartInput"
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+  /cart/{productId}:
+    patch:
+      operationId: updateCartItem
+      tags: [cart]
+      summary: Change cart quantity
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartQuantityInput"
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+    delete:
+      operationId: removeCartItem
+      tags: [cart]
+      summary: Remove a cart item
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+      responses:
+        "200":
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List current user orders
+      responses:
+        "200":
+          description: Orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Place a demo order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Placed order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+  /seller/dashboard:
+    get:
+      operationId: getSellerDashboard
+      tags: [seller]
+      summary: Get seller dashboard totals
+      responses:
+        "200":
+          description: Seller dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SellerDashboard"
+  /seller/orders:
+    get:
+      operationId: listSellerOrders
+      tags: [seller]
+      summary: List orders containing seller products
+      responses:
+        "200":
+          description: Seller orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
 components:
+  parameters:
+    ProductId:
+      in: path
+      name: id
+      required: true
+      schema: { type: integer }
+    ProductIdPath:
+      in: path
+      name: productId
+      required: true
+      schema: { type: integer }
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +373,130 @@ components:
           type: string
       required:
         - status
+    User:
+      type: object
+      required: [id, name, email, phone, role]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        role: { type: string, enum: [buyer, seller, admin] }
+    AuthInput:
+      type: object
+      required: [email, password]
+      properties:
+        name: { type: string }
+        email: { type: string, minLength: 3 }
+        phone: { type: string }
+        password: { type: string, minLength: 6 }
+    Product:
+      type: object
+      required: [id, sellerId, sellerName, name, price, category, description, image, quantity, rating, createdAt]
+      properties:
+        id: { type: integer }
+        sellerId: { type: integer }
+        sellerName: { type: string }
+        name: { type: string }
+        price: { type: number }
+        currency: { type: string }
+        category: { type: string }
+        description: { type: string }
+        image: { type: string }
+        quantity: { type: integer }
+        rating: { type: number }
+        createdAt: { type: string }
+    ProductInput:
+      type: object
+      required: [name, price, category, description, image, quantity]
+      properties:
+        name: { type: string, minLength: 2 }
+        price: { type: number, minimum: 0 }
+        category: { type: string, minLength: 2 }
+        description: { type: string, minLength: 2 }
+        image: { type: string }
+        quantity: { type: integer, minimum: 0 }
+        sellerName: { type: string }
+    HomeSummary:
+      type: object
+      required: [featured, trending, recommended, categories]
+      properties:
+        featured:
+          type: array
+          items: { $ref: "#/components/schemas/Product" }
+        trending:
+          type: array
+          items: { $ref: "#/components/schemas/Product" }
+        recommended:
+          type: array
+          items: { $ref: "#/components/schemas/Product" }
+        categories:
+          type: array
+          items: { type: string }
+    CartItem:
+      type: object
+      required: [product, quantity, lineTotal]
+      properties:
+        product: { $ref: "#/components/schemas/Product" }
+        quantity: { type: integer }
+        lineTotal: { type: number }
+    Cart:
+      type: object
+      required: [items, subtotal, delivery, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/CartItem" }
+        subtotal: { type: number }
+        delivery: { type: number }
+        total: { type: number }
+    CartInput:
+      type: object
+      required: [productId, quantity]
+      properties:
+        productId: { type: integer }
+        quantity: { type: integer, minimum: 1 }
+    CartQuantityInput:
+      type: object
+      required: [quantity]
+      properties:
+        quantity: { type: integer, minimum: 0 }
+    OrderInput:
+      type: object
+      required: [customerName, phone, deliveryAddress]
+      properties:
+        customerName: { type: string, minLength: 2 }
+        phone: { type: string, minLength: 7 }
+        deliveryAddress: { type: string, minLength: 5 }
+    OrderItem:
+      type: object
+      required: [productId, productName, quantity, price]
+      properties:
+        productId: { type: integer }
+        productName: { type: string }
+        quantity: { type: integer }
+        price: { type: number }
+    Order:
+      type: object
+      required: [id, total, status, deliveryAddress, phone, createdAt, items]
+      properties:
+        id: { type: integer }
+        total: { type: number }
+        status: { type: string }
+        deliveryAddress: { type: string }
+        phone: { type: string }
+        createdAt: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/OrderItem" }
+    SellerDashboard:
+      type: object
+      required: [totalProducts, totalOrders, sales, products]
+      properties:
+        totalProducts: { type: integer }
+        totalOrders: { type: integer }
+        sales: { type: number }
+        products:
+          type: array
+          items: { $ref: "#/components/schemas/Product" }
 

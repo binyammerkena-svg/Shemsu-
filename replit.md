@@ -1,10 +1,10 @@
-# [Project name]
+# SHEMSU
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+SHEMSU is a mobile-first Ethiopian and African marketplace where shoppers browse, swipe, save, and order products from local sellers.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -22,23 +22,31 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/shemsu/src/App.tsx` — mobile-first marketplace UI and routes
+- `artifacts/api-server/src/routes/marketplace.ts` — auth, catalog, favorites, cart, orders, and seller API
+- `lib/api-spec/openapi.yaml` — API contract source of truth
+- `lib/db/src/schema/index.ts` — PostgreSQL schema for marketplace data
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The API contract is OpenAPI-first and generated React Query hooks are used by the frontend.
+- Checkout is intentionally demo-only; no financial provider is called.
+- User passwords are stored as salted scrypt hashes, while sessions are stored in PostgreSQL and sent via HttpOnly cookies.
+- Prices are returned as ETB today, with a currency field in the product response for future multi-currency support.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
-
-## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Browse/search products across ten categories
+- Discover products with pointer/touch swipe gestures
+- Save favorites, manage a cart, and place demo orders
+- Buyer profile with order history and demo sign-up/login
+- Seller dashboard with product create/edit/delete and seller order views
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Sample buyer login: `buyer@shemsu.demo` / `shemsu123`
+- Sample seller login: `seller@shemsu.demo` / `shemsu123`
+- Product images are public Pexels image URLs; sellers provide an image URL in the MVP.
 
 ## Pointers
 

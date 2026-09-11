@@ -1,0 +1,1 @@
+- [Generated fetch DOM iterable types](generated-fetch-dom-iterable.md) — Orval browser clients need both DOM and DOM iterable TypeScript libs.
