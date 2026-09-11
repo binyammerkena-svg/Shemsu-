@@ -1,0 +1,57 @@
+name: Build SHEMSU Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build SHEMSU web app
+        run: pnpm --filter ./artifacts/shemsu run build
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Add Capacitor Android
+        working-directory: artifacts/shemsu
+        run: npx cap add android
+
+      - name: Sync Capacitor
+        working-directory: artifacts/shemsu
+        run: npx cap sync android
+
+      - name: Build APK
+        working-directory: artifacts/shemsu/android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SHEMSU-debug-APK
+          path: artifacts/shemsu/android/app/build/outputs/apk/debug/app-debug.apk
