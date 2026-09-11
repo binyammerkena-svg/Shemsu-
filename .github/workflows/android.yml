@@ -31,6 +31,7 @@ jobs:
       - name: Build SHEMSU web app
         env:
           PORT: 5000
+          BASE_PATH: /
         run: pnpm --filter ./artifacts/shemsu run build
 
       - name: Setup Java
@@ -59,3 +60,4 @@ jobs:
         with:
           name: SHEMSU-debug-APK
           path: artifacts/shemsu/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
