@@ -99,8 +99,20 @@ function useShopActions() {
   const addFavorite = useAddFavorite();
   const removeFavorite = useRemoveFavorite();
   const addCart = useAddToCart();
-  const { data: favorites = [] } = useListFavorites({ query: { enabled: !!me, retry: false, queryKey: getListFavoritesQueryKey() } });
-  const favoriteIds = useMemo(() => new Set(favorites.map(p => p.id)), [favorites]);
+  const { data: favorites } = useListFavorites({
+  query: {
+    enabled: !!me,
+    retry: false,
+    queryKey: getListFavoritesQueryKey(),
+  },
+});
+
+const favoriteList = Array.isArray(favorites) ? favorites : [];
+
+const favoriteIds = useMemo(
+  () => new Set(favoriteList.map((p) => p.id)),
+  [favoriteList],
+);
   const onFavorite = (product: Product) => {
     const mutation = favoriteIds.has(product.id) ? removeFavorite : addFavorite;
     mutation.mutate({ productId: product.id }, { onSuccess: () => { qc.invalidateQueries({ queryKey: getListFavoritesQueryKey() }); toast({ title: favoriteIds.has(product.id) ? 'Removed from saved' : 'Saved for later' }); }, onError: () => toast({ title: 'Sign in to save products', variant: 'destructive' }) });
