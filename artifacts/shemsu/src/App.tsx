@@ -55,7 +55,14 @@ function Shell({ children }: { children: ReactNode }) {
         <Link href="/" className="flex items-center gap-2.5" data-testid="link-logo"><span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-primary text-secondary shadow-sm"><span className="font-display text-xl">S</span></span><span className="font-display text-[25px] font-bold tracking-tight text-primary">shemsu<span className="text-accent">.</span></span></Link>
         <div className="hidden flex-1 justify-center md:flex"><nav className="flex items-center gap-1 rounded-full bg-muted/60 p-1">{nav.slice(0, 3).map(({ href, label, icon: Icon }) => <Link key={href} href={href} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${isActive(href) ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground hover:text-primary'}`} data-testid={`link-nav-${label.toLowerCase()}`}><Icon size={15} />{label}</Link>)}</nav></div>
         <div className="flex items-center gap-1.5">
-          <Link href="/cart" className="relative flex h-11 w-11 items-center justify-center rounded-full text-primary hover:bg-muted" data-testid="link-cart"><ShoppingCart size={21} />{cart && cart.items.length > 0 && <span className="absolute right-1 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">{cart.items.length}</span>}</Link>
+          <Link href="/cart" className="relative flex h-11 w-11 items-center justify-center rounded-full text-primary hover:bg-muted" data-testid="link-cart">
+  <ShoppingCart size={21} />
+  {(cart?.items?.length ?? 0) > 0 && (
+    <span className="absolute right-1 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
+      {cart?.items?.length ?? 0}
+    </span>
+  )}
+</Link>
           {health.isError && <span className="hidden text-[10px] font-semibold text-accent lg:inline" data-testid="status-health">Offline mode</span>}
           <button onClick={() => setMenu(!menu)} className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-primary md:hidden" data-testid="button-mobile-menu"><Menu size={20} /></button>
           <Link href={me ? '/profile' : '/profile'} className="hidden h-11 items-center gap-2 rounded-full border border-border bg-card px-3 text-sm font-semibold text-primary sm:flex" data-testid="link-account"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-secondary font-bold text-primary">{me?.name?.slice(0, 1).toUpperCase() ?? <CircleUserRound size={16} />}</span>{me?.name?.split(' ')[0] ?? 'Account'}</Link>
